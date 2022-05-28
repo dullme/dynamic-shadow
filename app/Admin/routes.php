@@ -15,4 +15,5 @@ Route::group([
     $router->get('/', 'HomeController@index');
 
     $router->resource('projects', 'ProjectController');
+    $router->resource('sales_orders', 'SalesOrderController');
 });

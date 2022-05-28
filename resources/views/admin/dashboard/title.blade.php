@@ -27,7 +27,7 @@
 <div class="dashboard-title card bg-primary">
     <div class="card-body">
         <div class="text-center ">
-            <img class="avatar img-circle shadow mt-1" src="{{ admin_asset('@admin/images/logo.png') }}">
+            <img class="avatar img-circle shadow mt-1" src="{{ asset('images/logo-v-white.png') }}" style="background: unset">
 
             <div class="text-center mb-1">
                 <h1 class="mb-3 mt-2 text-white">Dynamics 365 Shadow</h1>

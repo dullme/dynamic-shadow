@@ -23,7 +23,7 @@ return [
     |
     */
     'logo' => '<img src="/vendor/dcat-admin/images/logo.png" width="35"> &nbsp;Dynamics Shadow',
-    'voltage-logo-black' => '<img src="/images/voltage-logo-black.png">',
+    'voltage-logo-black' => '<img src="/images/voltage-logo-black.png" width="330px">',
     'voltage-logo-white' => '<img src="/images/voltage-logo-white.png">',
 
     /*

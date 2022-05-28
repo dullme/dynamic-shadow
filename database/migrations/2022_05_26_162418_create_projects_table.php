@@ -15,7 +15,7 @@ class CreateProjectsTable extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('no')->unique()->default('')->comment('项目编号');
+            $table->string('no')->unique()->comment('项目编号');
             $table->string('search_description')->nullable()->default('');
             $table->string('description')->default('');
             $table->string('description_2')->nullable();
@@ -28,6 +28,11 @@ class CreateProjectsTable extends Migration
             $table->string('bill_to_post_code')->nullable();
             $table->string('bill_to_country_region_code')->nullable();
             $table->string('bill_to_contact_no')->nullable();
+            $table->string('project_manager')->nullable();
+            $table->string('project_size')->nullable();
+            $table->string('owner')->nullable();
+            $table->string('salesperson_code')->nullable();
+            $table->string('epc')->nullable();
             $table->timestamps();
         });
     }

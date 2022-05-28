@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Admin\Gird\Tools\SyncVoltageUSJob;
 use Str;
 use App\Admin\Metrics\Examples\NewUsers;
 use App\Admin\Metrics\ProjectStatusMetrics;
@@ -18,9 +19,6 @@ use Illuminate\Support\Facades\DB;
 
 class ProjectController extends AdminController
 {
-
-    private $us_project_table = 'dbo.Voltage US$Job$437dbf0e-84ff-417a-965d-ed2bb9650972';
-    private $cn_project_table = 'dbo.Voltage CN$Job$437dbf0e-84ff-417a-965d-ed2bb9650972';
 
     public function index(Content $content)
     {
@@ -53,6 +51,7 @@ class ProjectController extends AdminController
                 return "<span title='{$bill_to_address}'>{$str}</span>";
             })->sortable();
             $grid->column('status')->using(ProjectStatus::getKeys())->sortable();
+            $grid->column('salesperson_code')->sortable();
             $grid->column('created_at')->display(function ($created_at) {
                 return substr($created_at, 0, 10);
             })->sortable();
@@ -71,6 +70,8 @@ class ProjectController extends AdminController
             });
 
             $grid->model()->orderBy('created_at', 'desc');
+
+            $grid->tools(new SyncVoltageUSJob());
 
             $grid->disableCreateButton();
             $grid->disableActions();
@@ -114,54 +115,5 @@ class ProjectController extends AdminController
             $form->display('created_at');
             $form->display('updated_at');
         });
-    }
-
-    public function dynamicSQL()
-    {
-        $us_projects = DB::connection('azure')->table($this->us_project_table)->get();
-
-        $us_project_nos = $us_projects->map(function ($project) {
-            return $this->createProject($project);
-        });
-
-        $cn_projects = DB::connection('azure')->table($this->cn_project_table)->whereNotIn('No_', $us_project_nos)->get();
-        $cn_project_nos = $cn_projects->map(function ($project) use ($us_project_nos) {
-            return $this->createProject($project);
-        });
-
-
-        dd($cn_project_nos);
-    }
-
-    /**
-     * 创建项目
-     * @param $project
-     * @return mixed
-     */
-    public function createProject($project)
-    {
-        $created_at = \Carbon\Carbon::parse($project['Creation Date']);
-        $updated_at = \Carbon\Carbon::parse($project['Last Date Modified']);
-        \App\Models\Project::updateOrInsert(
-            ['no' => $project['No_']],
-            [
-                'search_description'          => $project['Search Description'],
-                'description'                 => $project['Description'],
-                'description_2'               => $project['Description 2'],
-                'bill_to_customer_no'         => $project['Bill-to Customer No_'],
-                'bill_to_name'                => $project['Bill-to Name'],
-                'bill_to_address'             => $project['Bill-to Address'],
-                'bill_to_address_2'           => $project['Bill-to Address 2'],
-                'bill_to_city'                => $project['Bill-to City'],
-                'bill_to_post_code'           => $project['Bill-to Post Code'],
-                'bill_to_country_region_code' => $project['Bill-to Country_Region Code'],
-                'bill_to_contact_no'          => $project['Bill-to Contact No_'],
-                'status'                      => $project['Status'],
-                'created_at'                  => $created_at < '1970-01-01' ? null : $created_at,
-                'updated_at'                  => $updated_at < '1970-01-01' ? null : $updated_at,
-            ]
-        );
-
-        return $project['No_'];
     }
 }
