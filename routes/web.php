@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
 
+    return  redirect('/admin');
+
     (new \App\Admin\Controllers\ProjectController())->dynamicSQL();
 
     $po = request()->input('po');

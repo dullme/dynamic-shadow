@@ -92,7 +92,7 @@ class SyncVoltageCNSalesOrderLine extends AbstractTool
             return $this->createSalesLine($sales_line);
         });
 
-        $cn_sales_lines->groupBy('Document No_')->map(function ($cn_sales_lines, $salesOrderNo){
+        $cn_sales_lines->groupBy('Document No_')->map(function ($cn_sales_lines, $salesOrderNo) {
             $this->updateSalesOrder($cn_sales_lines, $salesOrderNo);
         });
     }
@@ -129,25 +129,26 @@ class SyncVoltageCNSalesOrderLine extends AbstractTool
 
     public function updateSalesOrder($cn_sales_lines, $salesOrderNo)
     {
-        if($cn_sales_lines->sum('Quantity Shipped') == 0){
+        if ($cn_sales_lines->sum('Quantity Shipped') == 0) {
             $shipped = SalesOrderShippedStatus::Waiting;//未开始
-        }elseif($cn_sales_lines->sum('Quantity Shipped') < $cn_sales_lines->sum('Quantity')){
+        } else if ($cn_sales_lines->sum('Quantity Shipped') < $cn_sales_lines->sum('Quantity')) {
             $shipped = SalesOrderShippedStatus::Processing;//进行中
-        }else{
+        } else {
             $shipped = SalesOrderShippedStatus::Completed;//已完成
         }
 
-        if($cn_sales_lines->sum('Quantity Invoiced') == 0){
+        if ($cn_sales_lines->sum('Quantity Invoiced') == 0) {
             $invoiced = '1';//未开始
-        }elseif($cn_sales_lines->sum('Quantity Invoiced') < $cn_sales_lines->sum('Quantity')){
+        } else if ($cn_sales_lines->sum('Quantity Invoiced') < $cn_sales_lines->sum('Quantity')) {
             $invoiced = '2';//进行中
-        }else{
+        } else {
             $invoiced = '3';//已完成
         }
 
         SalesOrder::where('no', $salesOrderNo)->update([
-            'shipped_status' => $shipped,
-            'invoiced_status' =>$invoiced,
+            'shipped_status'  => $shipped,
+            'invoiced_status' => $invoiced,
+            'item_categories' => implode(',', $cn_sales_lines->pluck('Item Category Code')->unique()->toArray()),
         ]);
     }
 }

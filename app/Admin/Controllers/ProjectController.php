@@ -6,7 +6,7 @@ use App\Admin\Gird\Tools\SyncVoltageUSJob;
 use Str;
 use App\Admin\Metrics\Examples\NewUsers;
 use App\Admin\Metrics\ProjectStatusMetrics;
-use App\Admin\Metrics\TotalProjects;
+use App\Admin\Metrics\TotalProjectsMetrics;
 use App\Admin\Repositories\Project;
 use App\Enums\ProjectStatus;
 use Dcat\Admin\Form;
@@ -26,8 +26,7 @@ class ProjectController extends AdminController
             ->header('Projects')
             ->description('Projects information')
             ->body(function (Row $row) {
-                $row->column(4, new TotalProjects());
-                $row->column(4, new NewUsers());
+                $row->column(4, new TotalProjectsMetrics());
                 $row->column(4, new ProjectStatusMetrics());
             })
             ->body($this->grid());

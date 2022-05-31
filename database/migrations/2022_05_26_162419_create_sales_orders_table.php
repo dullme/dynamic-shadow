@@ -38,6 +38,7 @@ class CreateSalesOrdersTable extends Migration
             $table->string('project_name')->nullable();
             $table->integer('shipped_status')->default(0)->comment('所有行是否全部发货完成');
             $table->integer('invoiced_status')->default(0)->comment('所有行是否全部已开发票');
+            $table->string('item_categories')->nullable();
             $table->timestamps();
         });
     }

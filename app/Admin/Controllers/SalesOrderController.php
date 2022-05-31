@@ -4,6 +4,16 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Gird\Tools\SyncVoltageCNSalesOrder;
 use App\Admin\Gird\Tools\SyncVoltageCNSalesOrderLine;
+use App\Admin\Metrics\Examples\NewDevices;
+use App\Admin\Metrics\Examples\NewUsers;
+use App\Admin\Metrics\Examples\ProductOrders;
+use App\Admin\Metrics\Examples\Sessions;
+use App\Admin\Metrics\Examples\Tickets;
+use App\Admin\Metrics\Examples\TotalUsers;
+use App\Admin\Metrics\ProjectStatusMetrics;
+use App\Admin\Metrics\SalesOrdersMetrics;
+use App\Admin\Metrics\TotalProjectsMetrics;
+use App\Admin\Metrics\TotalSalesOrdersMetrics;
 use App\Admin\Repositories\SalesOrder;
 use App\Enums\SalesOrderShippedStatus;
 use App\Enums\SalesOrderStatus;
@@ -11,11 +21,24 @@ use App\Models\SalesLine;
 use Dcat\Admin\Layout\Content;
 use Dcat\Admin\Form;
 use Dcat\Admin\Grid;
+use Dcat\Admin\Layout\Row;
 use Dcat\Admin\Show;
 use Dcat\Admin\Http\Controllers\AdminController;
 
 class SalesOrderController extends AdminController
 {
+    public function index(Content $content)
+    {
+        return $content
+            ->header('Sales Orders')
+            ->description('Sales Orders information')
+            ->body(function (Row $row) {
+                $row->column(4, new TotalSalesOrdersMetrics());
+                $row->column(4, new SalesOrdersMetrics());
+            })
+            ->body($this->grid());
+    }
+
     /**
      * Make a grid builder.
      *
@@ -31,7 +54,10 @@ class SalesOrderController extends AdminController
             })->sortable();
             $grid->column('project_no')->sortable();
             $grid->column('project_name')->sortable();
-            $grid->column('sell_to_customer_no')->sortable();
+            $grid->column('item_categories')->display(function ($item_categories){
+                return explode(',', $item_categories);
+            })->label('default');
+//            $grid->column('sell_to_customer_no')->sortable();
             $grid->column('sell_to_customer_name')->sortable();
             $grid->column('external_document_no')->sortable();
             $grid->column('status')->using(SalesOrderStatus::getKeys())->sortable();
@@ -41,9 +67,9 @@ class SalesOrderController extends AdminController
             $grid->column('document_date')->display(function ($document_date) {
                 return substr($document_date, 0, 10);
             })->sortable();
+
             $grid->column('shipped_status')->using(SalesOrderShippedStatus::getKeys())
                 ->dot([
-                    SalesOrderShippedStatus::Unknown => 'default',
                     SalesOrderShippedStatus::Waiting => 'warning',
                     SalesOrderShippedStatus::Processing => 'primary',
                     SalesOrderShippedStatus::Completed => 'success',
@@ -55,6 +81,7 @@ class SalesOrderController extends AdminController
                 $filter->like('project_name');
                 $filter->like('external_document_no');
                 $filter->equal('status')->select(SalesOrderStatus::getKeys());
+                $filter->in('shipped_status')->multipleSelect(SalesOrderShippedStatus::getKeys());
 
             });
 

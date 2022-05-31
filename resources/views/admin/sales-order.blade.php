@@ -31,7 +31,12 @@
         <div class="card dcat-box">
             <div class="box-header with-border" style="padding: .65rem 1rem">
                 <h3 class="box-title" style="line-height:30px;">{{ $salesOrder->no }}
-                    ∙ {{ $salesOrder->sell_to_customer_name }}</h3>
+                    ∙ {{ $salesOrder->sell_to_customer_name }}
+                    @foreach($salesLines->pluck('item_category_code')->unique() as $category)
+                        <span class="label bg-default">{{ $category }}</span>
+                    @endforeach
+                </h3>
+
                 <div class="pull-right">
                     <div class="btn-group pull-right btn-mini" style="margin-right: 5px">
                         <a href="http://dynamic.test/admin/sales_orders" class="btn btn-sm btn-primary ">
@@ -135,8 +140,8 @@
             <th>Unit of Measure Code</th>
             <th style="text-align: right">Unit Price Excl. VAT</th>
             <th style="text-align: right">Line Amount Excl. VAT</th>
-            <th style="text-align: right">Quantity Shipped</th>
-            <th style="text-align: right">Quantity Invoiced</th>
+            <th style="text-align: center">Quantity Shipped</th>
+            <th style="text-align: center">Quantity Invoiced</th>
         </tr>
         </thead>
 
@@ -144,7 +149,7 @@
         @foreach($salesLines as $key=>$salesLine)
             <tr {{ $currency = $salesOrder->currency_code == '' ? 'CNY' :$salesOrder->currency_code }}>
                 <td>{{ ++$key }}</td>
-                <td>{{ $salesLine->type }}</td>
+                <td>{{ \App\Enums\SalesLineType::getKey($salesLine->type) }}</td>
                 <td>{{ $salesLine->no }}</td>
                 <td>{{ $salesLine->variant_code }}</td>
                 <td>{{ $salesLine->description }}</td>
@@ -153,14 +158,19 @@
                 <td>{{ $salesLine->unit_of_measure_code }}</td>
                 <td style="text-align: right">{{ $salesLine->unit_price && $salesLine->unit_price != 0 ? getCurrencyIcon($currency).floatval($salesLine->unit_price) : '-' }}</td>
                 <td style="text-align: right">{{ $salesLine->line_amount && $salesLine->line_amount != 0 ? getCurrencyIcon($currency).floatval($salesLine->line_amount) : '-' }}</td>
-                <td style="text-align: right">
-                    @if($salesLine->quantity_shipped == $salesLine->quantity && $salesLine->quantity)
-                        <i class="fa fa-check text-success"></i>
-                    @else
-                        {{ $salesLine->quantity_shipped ? floatval($salesLine->quantity_shipped).'/'.floatval($salesLine->quantity) : '-' }}
-                    @endif
-                </td>
-                <td style="text-align: right">{{ $salesLine->quantity_invoiced ? floatval($salesLine->quantity_invoiced) : '-' }}</td>
+
+                @if($salesLine->quantity_shipped == $salesLine->quantity && $salesLine->quantity)
+                    <td style="text-align: center;"><i class="fa fa-check text-success"></i></td>
+                @else
+                    <td style="text-align: center">{{ $salesLine->quantity_shipped ? floatval($salesLine->quantity_shipped).'/'.floatval($salesLine->quantity) : '-' }}</td>
+                @endif
+
+                @if($salesLine->quantity_invoiced == $salesLine->quantity && $salesLine->quantity)
+                    <td style="text-align: center;"><i class="fa fa-check text-success"></i></td>
+                @else
+                    <td style="text-align: center">{{ $salesLine->quantity_invoiced ? floatval($salesLine->quantity_invoiced).'/'.floatval($salesLine->quantity) : '-' }}</td>
+                @endif
+
             </tr>
         @endforeach
 

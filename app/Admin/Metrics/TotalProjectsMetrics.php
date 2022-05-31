@@ -8,7 +8,7 @@ use Dcat\Admin\Widgets\Metrics\Card;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 
-class TotalProjects extends Card
+class TotalProjectsMetrics extends Card
 {
 
     /**
