@@ -39,7 +39,7 @@
 
                 <div class="pull-right">
                     <div class="btn-group pull-right btn-mini" style="margin-right: 5px">
-                        <a href="http://dynamic.test/admin/sales_orders" class="btn btn-sm btn-primary ">
+                        <a href="{{ url('/admin/sales_orders') }}" class="btn btn-sm btn-primary ">
                             <i class="feather icon-list"></i><span class="d-none d-sm-inline"> List</span>
                         </a>
                     </div>
